@@ -13,6 +13,7 @@ def main():
     options = selenium.webdriver.ChromeOptions()
     options.add_argument('--headless')
     driver = selenium.webdriver.Chrome(service=service, options=options)
+    driver1 = selenium.webdriver.Chrome(service=service, options=options)
 
     driver.get('https://www.markji.com/deck/677629bf4b4cda45377c7a6e')
     chapter_with_cards = WebDriverWait(driver, 10).until(
@@ -30,12 +31,12 @@ def main():
                 row_engurl = json.loads(row_engurl)['url']
                 row_engtitle = row_engurl.split('/')[-2]
                 row_cnurl = f'https://leetcode.cn/problems/{row_engtitle}/description'
-                driver.get(row_cnurl)
-                row_cntitle = WebDriverWait(driver, 10).until(
+                driver1.get(row_cnurl)
+                row_cntitle = WebDriverWait(driver1, 10).until(
                     EC.presence_of_element_located((By.XPATH, f'//*[@href="/problems/{row_engtitle}/"]'))
                 ).text
                 if row_text == row_cntitle:
-                    row_text = f'[{row_text}({row_cnurl})]'
+                    row_text = f'[{row_text}]({row_cnurl})'
             print(row_text)
             f.write(f'{"##" if row_class == "chapter-item" else "###"} {row_text}\n')
 
