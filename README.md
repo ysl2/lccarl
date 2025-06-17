@@ -1,15 +1,124 @@
 # lccarl
 
 ## 数组
+
 ### [27. 移除元素](https://leetcode.cn/problems/remove-element/description)
+
+```python
+class Solution:
+    def removeElement(self, nums: List[int], val: int) -> int:
+        left = 0
+        for right in range(len(nums)):
+            if nums[right] != val:
+                nums[left], nums[right] = nums[right], nums[left]
+                left += 1
+        return left
+```
+
 ### [977. 有序数组的平方](https://leetcode.cn/problems/squares-of-a-sorted-array/description)
+
+```python
+class Solution:
+    def sortedSquares(self, nums: List[int]) -> List[int]:
+        left, right = 0, len(nums) - 1
+        res = [0] * len(nums)
+        p = len(nums) - 1
+        while left <= right:
+            x = nums[left] ** 2
+            y = nums[right] ** 2
+            if x > y:
+                res[p] = x
+                left += 1
+                p -= 1
+            else:
+                res[p] = y
+                right -= 1
+                p -= 1
+        return res
+```
+
 ### [209. 长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/description)
+
+```python
+class Solution:
+    def minSubArrayLen(self, target: int, nums: List[int]) -> int:
+        window = 0
+        res = inf
+        left = 0
+        for right in range(len(nums)):
+            window += nums[right]
+            while window >= target:
+                res = min(res, right - left + 1)
+                window -= nums[left]
+                left += 1
+        return res if res < inf else 0
+```
+
 ### [59. 螺旋矩阵 II](https://leetcode.cn/problems/spiral-matrix-ii/description)
+
+```python
+DIRS = ((0, 1), (1, 0), (0, -1), (-1, 0))
+
+class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        m = n
+        size = n * n
+        res = [[0] * n for _ in range(n)]
+        i, j, di = 0, -1, 0
+        num = 1
+        while num <= size:
+            dx, dy = DIRS[di]
+            for _ in range(n):
+                i += dx
+                j += dy
+                res[i][j] = num
+                num += 1
+            di = (di + 1) % len(DIRS)
+            m, n = n, m - 1
+        return res
+```
+
 ### [303. 区域和检索 - 数组不可变 | 58. 区间和（第九期模拟笔试）](https://leetcode.cn/problems/range-sum-query-immutable/description)
+
+```python
+class NumArray:
+
+    def __init__(self, nums: List[int]):
+        self.cnt = [0]
+        for num in nums:
+            self.cnt.append(self.cnt[-1] + num)
+
+    def sumRange(self, left: int, right: int) -> int:
+        return self.cnt[right + 1] - self.cnt[left]
+```
+
 ### 44. 开发商购买土地（第五期模拟笔试）（暂未找到力扣）
+
 ## 链表
+
 ### [203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/description)
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+
+class Solution:
+    def removeElements(self, head: Optional[ListNode], val: int) -> Optional[ListNode]:
+        p = dummy = ListNode(next=head)
+        while p and p.next:
+            if p.next.val == val:
+                p.next = p.next.next
+            else:
+                p = p.next
+        return dummy.next
+```
+
 ### [707. 设计链表](https://leetcode.cn/problems/design-linked-list/description)
+
 ## 哈希表
 ### [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/description)
 ### [349. 两个数组的交集](https://leetcode.cn/problems/intersection-of-two-arrays/description)
