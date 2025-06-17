@@ -120,32 +120,393 @@ class Solution:
 ### [707. 设计链表](https://leetcode.cn/problems/design-linked-list/description)
 
 ## 哈希表
+
 ### [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/description)
+
+```python
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        cnt = defaultdict(int)
+        for c in s:
+            cnt[c] += 1
+        for c in t:
+            cnt[c] -= 1
+        return not any(cnt.values())
+```
+
 ### [349. 两个数组的交集](https://leetcode.cn/problems/intersection-of-two-arrays/description)
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        return list(set(nums1) & set(nums2))
+```
+
 ### [202. 快乐数](https://leetcode.cn/problems/happy-number/description)
+
+```python
+class Solution:
+    def isHappy(self, n: int) -> bool:
+        mp = set()
+        while n != 1 and n not in mp:
+            mp.add(n)
+            n = sum(int(c) ** 2 for c in str(n))
+        return n == 1
+```
+
 ### [454. 四数相加 II](https://leetcode.cn/problems/4sum-ii/description)
+
+```python
+class Solution:
+    def fourSumCount(self, nums1: List[int], nums2: List[int], nums3: List[int], nums4: List[int]) -> int:
+        cnt = Counter(num1 + num2 for num1 in nums1 for num2 in nums2)
+        return sum(cnt[-(num3 + num4)] for num3 in nums3 for num4 in nums4)
+```
+
 ### [383. 赎金信](https://leetcode.cn/problems/ransom-note/description)
+
+```python
+class Solution:
+    def canConstruct(self, ransomNote: str, magazine: str) -> bool:
+        return not (Counter(ransomNote) - Counter(magazine))
+```
+
 ### [18. 四数之和](https://leetcode.cn/problems/4sum/description)
+
+```python
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        nums.sort()
+        n = len(nums)
+        res = []
+        for first in range(n - 3):
+            if first > 0 and nums[first - 1] == nums[first]:
+                continue
+            for second in range(first + 1, n - 2):
+                if second > first + 1 and nums[second - 1] == nums[second]:
+                    continue
+                forth = n - 1
+                sub_target = target - nums[first] - nums[second]
+                for third in range(second + 1, n - 1):
+                    if third > second + 1 and nums[third - 1] == nums[third]:
+                        continue
+                    while third < forth and nums[third] + nums[forth] > sub_target:
+                        forth -= 1
+                    if third == forth:
+                        break
+                    elif nums[third] + nums[forth] == sub_target:
+                        res.append([nums[first], nums[second], nums[third], nums[forth]])
+        return res
+```
+
 ## 字符串
+
 ### [344. 反转字符串](https://leetcode.cn/problems/reverse-string/description)
+
+```python
+class Solution:
+    def reverseString(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        left, right = 0, len(s) - 1
+        while left < right:
+            s[left], s[right] = s[right], s[left]
+            left += 1
+            right -= 1
+```
+
 ### [541. 反转字符串 II](https://leetcode.cn/problems/reverse-string-ii/description)
+
+```python
+class Solution:
+    def reverseStr(self, s: str, k: int) -> str:
+        s = list(s)
+        for i in range(0, len(s), 2 * k):
+            s[i : i + k] = reversed(s[i : i + k])
+        return ''.join(s)
+```
+
 ### 54. 替换数字（第八期模拟笔试）
+
 ### [151. 反转字符串中的单词](https://leetcode.cn/problems/reverse-words-in-a-string/description)
+
+```python
+class Solution:
+    def reverseWords(self, s: str) -> str:
+        return ' '.join(s.split()[::-1])
+```
+
 ### 55. 右旋字符串（第八期模拟笔试）
+
 ### [28. 找出字符串中第一个匹配项的下标](https://leetcode.cn/problems/find-the-index-of-the-first-occurrence-in-a-string/description)
+
+```python
+class Solution:
+    def strStr(self, haystack: str, needle: str) -> int:
+        if not needle:
+            return 0
+        m, n = len(haystack), len(needle)
+        mp = [0] * n
+        left = 0
+        for right in range(1, n):
+            while left > 0 and needle[left] != needle[right]:
+                left = mp[left - 1]
+            if needle[left] == needle[right]:
+                left += 1
+            mp[right] = left
+        left = 0
+        for right in range(m):
+            while left > 0 and needle[left] != haystack[right]:
+                left = mp[left - 1]
+            if needle[left] == haystack[right]:
+                left += 1
+            if left == n:
+                return right - n + 1
+        return -1
+```
+
 ### [459. 重复的子字符串](https://leetcode.cn/problems/repeated-substring-pattern/description)
+
+```python
+class Solution:
+    def repeatedSubstringPattern(self, s: str) -> bool:
+        n = len(s)
+        if n == 0:
+            return False
+        mp = [0] * n
+        left = 0
+        for right in range(1, n):
+            while left > 0 and s[left] != s[right]:
+                left = mp[left - 1]
+            if s[left] == s[right]:
+                left += 1
+            mp[right] = left
+        return mp[-1] > 0 and n % (n - mp[-1]) == 0
+```
+
 ## 栈与队列
+
 ### [232. 用栈实现队列](https://leetcode.cn/problems/implement-queue-using-stacks/description)
+
+```python
+class MyQueue:
+
+    def __init__(self):
+        self.a, self.b = [], []
+
+    def push(self, x: int) -> None:
+        self.a.append(x)
+
+    def move(self):
+        if not self.b:
+            while self.a:
+                self.b.append(self.a.pop())
+
+    def pop(self) -> int:
+        self.move()
+        return self.b.pop()
+
+    def peek(self) -> int:
+        self.move()
+        return self.b[-1]
+
+    def empty(self) -> bool:
+        return not self.a and not self.b
+```
+
 ### [225. 用队列实现栈](https://leetcode.cn/problems/implement-stack-using-queues/description)
+
+```python
+class MyStack:
+
+    def __init__(self):
+        self.a, self.b = deque(), deque()
+
+    def push(self, x: int) -> None:
+        self.a.append(x)
+
+    def pot(self, fn=''):
+        while len(self.a) > 1:
+            self.b.append(self.a.popleft())
+        res = self.a.popleft()
+        if fn == 'top':
+            self.b.append(res)
+        self.a, self.b = self.b, self.a
+        return res
+
+    def pop(self) -> int:
+        return self.pot(fn='pop')
+
+    def top(self) -> int:
+        return self.pot(fn='top')
+
+    def empty(self) -> bool:
+        return not self.a and not self.b
+```
+
 ### [1047. 删除字符串中的所有相邻重复项](https://leetcode.cn/problems/remove-all-adjacent-duplicates-in-string/description)
 ### [150. 逆波兰表达式求值](https://leetcode.cn/problems/evaluate-reverse-polish-notation/description)
+
 ## 二叉树
+
 ### [111. 二叉树的最小深度](https://leetcode.cn/problems/minimum-depth-of-binary-tree/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def minDepth(self, root: Optional[TreeNode]) -> int:
+        if not root:
+            return 0
+        q = deque([(root, 1)])
+        while q:
+            node, depth = q.popleft()
+            if not node.left and not node.right:
+                return depth
+            if node.left:
+                q.append((node.left, depth + 1))
+            if node.right:
+                q.append((node.right, depth + 1))
+        return 0
+```
+
 ### [222. 完全二叉树的节点个数](https://leetcode.cn/problems/count-complete-tree-nodes/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def countNodes(self, root: Optional[TreeNode]) -> int:
+        if not root:
+            return 0
+        left, right = root.left, root.right
+        left_depth, right_depth = 0, 0
+        while left:
+            left = left.left
+            left_depth += 1
+        while right:
+            right = right.right
+            right_depth += 1
+        if left_depth == right_depth:
+            return (2 << left_depth) - 1
+        return 1 + self.countNodes(root.left) + self.countNodes(root.right)
+```
+
 ### [110. 平衡二叉树](https://leetcode.cn/problems/balanced-binary-tree/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def isBalanced(self, root: Optional[TreeNode]) -> bool:
+        def dfs(root):
+            if not root:
+                return 0
+            if (l := dfs(root.left)) == -1:
+                return -1
+            if (r := dfs(root.right)) == -1:
+                return -1
+            if abs(l - r) > 1:
+                return -1
+            return max(l, r) + 1
+        return dfs(root) != -1
+```
+
 ### [257. 二叉树的所有路径](https://leetcode.cn/problems/binary-tree-paths/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def binaryTreePaths(self, root: Optional[TreeNode]) -> List[str]:
+        res = []
+        def dfs(root, tmp):
+            if not root:
+                return
+            tmp = tmp + [str(root.val)]
+            if not root.left and not root.right:
+                res.append('->'.join(tmp))
+                return
+            dfs(root.left, tmp)
+            dfs(root.right, tmp)
+        dfs(root, [])
+        return res
+```
+
 ### [404. 左叶子之和](https://leetcode.cn/problems/sum-of-left-leaves/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def sumOfLeftLeaves(self, root: Optional[TreeNode]) -> int:
+        self.res = 0
+        def dfs(root):
+            if not root:
+                return
+            if root.left and not root.left.left and not root.left.right:
+                self.res += root.left.val
+            dfs(root.left)
+            dfs(root.right)
+        dfs(root)
+        return self.res
+```
+
 ### [513. 找树左下角的值](https://leetcode.cn/problems/find-bottom-left-tree-value/description)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def findBottomLeftValue(self, root: Optional[TreeNode]) -> int:
+        q = deque([root])
+        while q:
+            node = q.popleft()
+            # Right first, then left.
+            if node.right:
+                q.append(node.right)
+            if node.left:
+                q.append(node.left)
+        return node.val
+```
+
 ### [112. 路径总和](https://leetcode.cn/problems/path-sum/description)
 ### [106. 从中序与后序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-inorder-and-postorder-traversal/description)
 ### [654. 最大二叉树](https://leetcode.cn/problems/maximum-binary-tree/description)
@@ -158,12 +519,102 @@ class Solution:
 ### [450. 删除二叉搜索树中的节点](https://leetcode.cn/problems/delete-node-in-a-bst/description)
 ### [669. 修剪二叉搜索树](https://leetcode.cn/problems/trim-a-binary-search-tree/description)
 ### [538. 把二叉搜索树转换为累加树](https://leetcode.cn/problems/convert-bst-to-greater-tree/description)
+
 ## 回溯算法
+
 ### [77. 组合](https://leetcode.cn/problems/combinations/description)
+
+```python
+class Solution:
+    def combine(self, n: int, k: int) -> List[List[int]]:
+        res = []
+        def dfs(i, tmp):
+            if len(tmp) == k:
+                res.append(tmp)
+                return
+            for j in range(i, n + 1):
+                dfs(j + 1, tmp + [j])
+        dfs(1, [])
+        return res
+```
+
 ### [216. 组合总和 III](https://leetcode.cn/problems/combination-sum-iii/description)
+
+```python
+class Solution:
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
+        res = []
+        def dfs(i, tmp):
+            if sum(tmp) == n and len(tmp) == k:
+                res.append(tmp)
+                return
+            for j in range(1, i):
+                dfs(j, tmp + [j])
+        dfs(10, [])
+        return res
+```
+
 ### [40. 组合总和 II](https://leetcode.cn/problems/combination-sum-ii/description)
+
+```python
+class Solution:
+    def combinationSum2(self, nums: List[int], target: int) -> List[List[int]]:
+        nums.sort()
+        res = []
+        def dfs(nums, tmp):
+            if sum(tmp) == target:
+                res.append(tmp)
+                return
+            for i in range(len(nums)):
+                if nums[i] > target - sum(tmp):
+                    break
+                if i > 0 and nums[i] == nums[i - 1]:
+                    continue
+                dfs(nums[i + 1:], tmp + [nums[i]])
+        dfs(nums, [])
+        return res
+```
+
 ### [93. 复原 IP 地址](https://leetcode.cn/problems/restore-ip-addresses/description)
+
+```python
+class Solution:
+    def restoreIpAddresses(self, s: str) -> List[str]:
+        res = []
+        def dfs(s, tmp):
+            if not s and len(tmp) == 4:
+                res.append('.'.join(tmp))
+                return
+            if not s or len(tmp) == 4:
+                return
+            for i in range(1, min(4, len(s) + 1)):
+                t = s[:i]
+                if (i > 1 and s[0] == '0') or int(t) > 255:
+                    continue
+                dfs(s[i:], tmp + [t])
+        dfs(s, [])
+        return res
+```
+
 ### [90. 子集 II](https://leetcode.cn/problems/subsets-ii/description)
+
+```python
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+        def dfs(nums, tmp):
+            res.append(tmp)
+            if not nums:
+                return
+            for i in range(len(nums)):
+                if i > 0 and nums[i - 1] == nums[i]:
+                    continue
+                dfs(nums[i + 1:], tmp + [nums[i]])
+        dfs(nums, [])
+        return res
+```
+
 ### [491. 非递减子序列](https://leetcode.cn/problems/non-decreasing-subsequences/description)
 ### [47. 全排列 II](https://leetcode.cn/problems/permutations-ii/description)
 ### [332. 重新安排行程](https://leetcode.cn/problems/reconstruct-itinerary/description)
