@@ -147,8 +147,8 @@ class Solution:
 ```python
 class Solution:
     def isHappy(self, n: int) -> bool:
-        mp = set()
-        while n != 1 and n not in mp:
+        window = set()
+        while n != 1 and n not in window:
             mp.add(n)
             n = sum(int(c) ** 2 for c in str(n))
         return n == 1
