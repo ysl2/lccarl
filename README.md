@@ -1,5 +1,7 @@
 # lccarl
 
+> 题单：https://programmercarl.com/
+
 ## 数组
 
 ### [27. 移除元素](https://leetcode.cn/problems/remove-element/description)
@@ -616,30 +618,211 @@ class Solution:
 ```
 
 ### [491. 非递减子序列](https://leetcode.cn/problems/non-decreasing-subsequences/description)
+
+```python
+class Solution:
+    def findSubsequences(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        def dfs(nums, tmp):
+            if len(tmp) >= 2:
+                res.append(tmp)
+            window = set()
+            for i in range(len(nums)):
+                if (nums[i] not in window) and (not tmp or tmp[-1] <= nums[i]):
+                    window.add(nums[i])
+                    dfs(nums[i + 1 :], tmp + [nums[i]])
+        dfs(nums, [])
+        return res
+```
+
 ### [47. 全排列 II](https://leetcode.cn/problems/permutations-ii/description)
 ### [332. 重新安排行程](https://leetcode.cn/problems/reconstruct-itinerary/description)
 ### [37. 解数独](https://leetcode.cn/problems/sudoku-solver/description)
+
 ## 贪心算法
+
 ### [455. 分发饼干](https://leetcode.cn/problems/assign-cookies/description)
+
+```python
+class Solution:
+    def findContentChildren(self, g: List[int], s: List[int]) -> int:
+        g.sort()
+        s.sort()
+        i, j = 0, 0
+        while i <= len(g) - 1 and j <= len(s) - 1:
+            if s[j] >= g[i]:
+                i += 1
+            j += 1
+        return i
+```
+
 ### [376. 摆动序列](https://leetcode.cn/problems/wiggle-subsequence/description)
+
+```python
+class Solution:
+    def wiggleMaxLength(self, nums: List[int]) -> int:
+        res, trend = 1, 0
+        for i in range(1, len(nums)):
+            if (
+                (nums[i] > nums[i - 1] and trend <= 0)
+                or (nums[i] < nums[i - 1] and trend >= 0)
+            ):
+                res += 1
+                trend = 1 if nums[i] > nums[i - 1] else -1
+        return res
+```
+
 ### [122. 买卖股票的最佳时机 II](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/description)
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        max_profit = 0
+        for i in range(1, len(prices)):
+            max_profit = max(max_profit, max_profit + (prices[i] - prices[i - 1]))
+        return max_profit
+```
+
 ### [1005. K 次取反后最大化的数组和](https://leetcode.cn/problems/maximize-sum-of-array-after-k-negations/description)
+
+```python
+class Solution:
+    def largestSumAfterKNegations(self, nums: List[int], k: int) -> int:
+        nums.sort()
+        for i in range(len(nums)):
+            if nums[i] < 0 and k > 0:
+                nums[i] = - nums[i]
+                k -= 1
+        if k % 2 == 1:
+            nums.sort()
+            nums[0] = - nums[0]
+        return sum(nums)
+```
+
 ### [134. 加油站](https://leetcode.cn/problems/gas-station/description)
+
+```python
+class Solution:
+    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:
+        res = tmp = tmp1 = 0
+        for i, (g, c) in enumerate(zip(gas, cost)):
+            tmp += g - c
+            if tmp < tmp1:
+                tmp1 = tmp
+                res = i + 1
+        return res if tmp >= 0 else -1
+```
+
 ### [135. 分发糖果](https://leetcode.cn/problems/candy/description)
+
+```python
+class Solution:
+    def candy(self, nums: List[int]) -> int:
+        n = len(nums)
+        res = [1] * n
+        for i in range(1, n):
+            if nums[i - 1] < nums[i]:
+                res[i] = res[i - 1] + 1
+        for i in range(n - 2, -1, -1):
+            if nums[i] > nums[i + 1]:
+                res[i] = max(res[i], res[i + 1] + 1)
+        return sum(res)
+```
+
 ### [860. 柠檬水找零](https://leetcode.cn/problems/lemonade-change/description)
 ### [406. 根据身高重建队列](https://leetcode.cn/problems/queue-reconstruction-by-height/description)
 ### [452. 用最少数量的箭引爆气球](https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/description)
 ### [435. 无重叠区间](https://leetcode.cn/problems/non-overlapping-intervals/description)
 ### [738. 单调递增的数字](https://leetcode.cn/problems/monotone-increasing-digits/description)
 ### [968. 监控二叉树](https://leetcode.cn/problems/binary-tree-cameras/description)
+
 ## 动态规划
+
 ### [509. 斐波那契数](https://leetcode.cn/problems/fibonacci-number/description)
+
+```python
+class Solution:
+    @cache
+    def fib(self, n: int) -> int:
+        if n == 0:
+            return 0
+        if n == 1:
+            return 1
+        return self.fib(n - 1) + self.fib(n - 2)
+```
+
 ### [746. 使用最小花费爬楼梯](https://leetcode.cn/problems/min-cost-climbing-stairs/description)
+
+```python
+class Solution:
+    def minCostClimbingStairs(self, cost: List[int]) -> int:
+        @cache
+        def dfs(i):
+            if i < 0:
+                return 0
+            return cost[i] + min(dfs(i - 1), dfs(i - 2))
+        return min(dfs(len(cost) - 1), dfs(len(cost) - 2))
+```
+
 ### [63. 不同路径 II](https://leetcode.cn/problems/unique-paths-ii/description)
+
+```python
+class Solution:
+    def uniquePathsWithObstacles(self, obstacleGrid: List[List[int]]) -> int:
+        @cache
+        def dfs(i, j):
+            if i < 0 or j < 0 or obstacleGrid[i][j]:
+                return 0
+            if i == 0 and j == 0:
+                return 1 - obstacleGrid[0][0]
+            return dfs(i - 1, j) + dfs(i, j - 1)
+        return dfs(len(obstacleGrid) - 1, len(obstacleGrid[0]) - 1)
+```
+
 ### [343. 整数拆分](https://leetcode.cn/problems/integer-break/description)
+
+```python
+class Solution:
+    @cache
+    def integerBreak(self, n: int) -> int:
+        res = 0
+        for i in range(1, n):
+            tmp = i * (n - i)
+            tmp1 = i * self.integerBreak(n - i)
+            res = max(res, tmp, tmp1)
+        return res
+```
+
 ### [96. 不同的二叉搜索树](https://leetcode.cn/problems/unique-binary-search-trees/description)
+
+```python
+class Solution:
+    @cache
+    def numTrees(self, n: int) -> int:
+        if n <= 1:
+            return 1
+        return sum(self.numTrees(i - 1) * self.numTrees(n - i) for i in range(1, n + 1))
+```
+
 ### 46. 携带研究材料（第六期模拟笔试）
+
 ### [1049. 最后一块石头的重量 II](https://leetcode.cn/problems/last-stone-weight-ii/description)
+
+```python
+class Solution:
+    def lastStoneWeightII(self, stones: List[int]) -> int:
+        self.res = inf
+        @cache
+        def dfs(i, tmp1, tmp2):
+            if i == len(stones):
+                self.res = min(self.res, abs(tmp1 - tmp2))
+                return
+            dfs(i + 1, tmp1 + stones[i], tmp2)
+            dfs(i + 1, tmp1, tmp2 + stones[i])
+        dfs(0, 0, 0)
+        return self.res
+```
+
 ### [494. 目标和](https://leetcode.cn/problems/target-sum/description)
 ### [474. 一和零](https://leetcode.cn/problems/ones-and-zeroes/description)
 ### 52. 携带研究材料（第七期模拟笔试）
@@ -662,19 +845,201 @@ class Solution:
 ### [583. 两个字符串的删除操作](https://leetcode.cn/problems/delete-operation-for-two-strings/description)
 ### [647. 回文子串](https://leetcode.cn/problems/palindromic-substrings/description)
 ### [516. 最长回文子序列](https://leetcode.cn/problems/longest-palindromic-subsequence/description)
+
 ## 单调栈
+
 ### [496. 下一个更大元素 I](https://leetcode.cn/problems/next-greater-element-i/description)
+
+```python
+class Solution:
+    def nextGreaterElement(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        mp = {}
+        st = []
+        for num in nums2:
+            while st and st[-1] < num:
+                mp[st.pop()] = num
+            st.append(num)
+        while st:
+            mp[st.pop()] = -1
+        return [mp[num] for num in nums1]
+```
+
 ### [503. 下一个更大元素 II](https://leetcode.cn/problems/next-greater-element-ii/description)
+
+```python
+class Solution:
+    def nextGreaterElements(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        res = [-1] * n
+        st = []
+        for i in range(2 * n):
+            while st and nums[st[-1]] < nums[i % n]:
+                res[st.pop()] = nums[i % n]
+            if i < n:
+                st.append(i)
+        return res
+```
+
 ## 图论
+
 ### [797. 所有可能的路径 | 98. 所有可达路径（卡码网）](https://leetcode.cn/problems/all-paths-from-source-to-target/description)
+
+```python
+class Solution:
+    def allPathsSourceTarget(self, graph: List[List[int]]) -> List[List[int]]:
+        res = []
+        def dfs(i, tmp):
+            if i == len(graph) - 1:
+                res.append(tmp)
+                return
+            for j in graph[i]:
+                dfs(j, tmp + [j])
+        dfs(0, [0])
+        return res
+```
+
 ### [695. 岛屿的最大面积 | 100. 岛屿的最大面积（卡码网）](https://leetcode.cn/problems/max-area-of-island/description)
+
+```python
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+        def dfs(i, j):
+            if not (
+                0 <= i <= len(grid) - 1
+                and 0 <= j <= len(grid[0]) - 1
+            ) or grid[i][j] != 1:
+                return 0
+            grid[i][j] = 2
+            return 1 + dfs(i - 1, j) + dfs(i + 1, j) + dfs(i, j - 1) + dfs(i, j + 1)
+
+        res = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    res = max(res, dfs(i, j))
+        return res
+```
+
 ### 101. 孤岛的总面积（卡码网）（暂未找到力扣）
 ### 102. 沉没孤岛（卡码网）（暂未找到力扣）
+
 ### [417. 太平洋大西洋水流问题 | 103. 水流问题（卡码网）](https://leetcode.cn/problems/pacific-atlantic-water-flow/description)
+
+```python
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        m, n = len(heights), len(heights[0])
+        pacific_visited = [[False] * n for _ in range(m)]
+        atlantic_visited = [[False] * n for _ in range(m)]
+        def dfs(i, j, visited):
+            visited[i][j] = True
+            for x, y in ((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)):
+                if (
+                    0 <= x <= m - 1
+                    and 0 <= y <= n - 1
+                    and not visited[x][y]
+                    and heights[i][j] <= heights[x][y]
+                ):
+                    dfs(x, y, visited)
+        for i in range(m):
+            dfs(i, 0, pacific_visited)
+        for j in range(n):
+            dfs(0, j, pacific_visited)
+        for i in range(m):
+            dfs(i, n - 1, atlantic_visited)
+        for j in range(n):
+            dfs(m - 1, j, atlantic_visited)
+        res = []
+        for i in range(m):
+            for j in range(n):
+                if pacific_visited[i][j] and atlantic_visited[i][j]:
+                    res.append([i, j])
+        return res
+```
+
 ### [827. 最大人工岛 | 104. 建造最大岛屿（卡码网）](https://leetcode.cn/problems/making-a-large-island/description)
+
+```python
+class Solution:
+    def largestIsland(self, grid: List[List[int]]) -> int:
+        def dfs(i, j, index):
+            if not (
+                0 <= i <= len(grid) - 1
+                and 0 <= j <= len(grid[0]) - 1
+            ) or grid[i][j] != 1:
+                return 0
+            grid[i][j] = index
+            return 1 + dfs(i - 1, j, index) + dfs(i + 1, j, index) + dfs(i, j - 1, index) + dfs(i, j + 1, index)
+
+        index = 2
+        mp = {}
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    mp[index] = dfs(i, j, index)
+                    index += 1
+
+        res = max(mp.values() or [0])
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 0:
+                    window = set()
+                    for x, y in ((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)):
+                        if (
+                            0 <= x <= len(grid) - 1
+                            and 0 <= y <= len(grid[0]) - 1
+                            and grid[x][y] > 1
+                        ):
+                            window.add(grid[x][y])
+                    res = max(res, 1 + sum(mp[index] for index in window))
+        return res
+```
+
 ### [127. 单词接龙 | 110. 字符串接龙（卡码网）](https://leetcode.cn/problems/word-ladder/description)
+
+```python
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        wordSet = set(wordList)
+        if endWord not in wordSet:
+            return 0
+        begin, end = {beginWord: 1}, {endWord: 1}
+        while begin:
+            if len(begin) > len(end):
+                begin, end = end, begin
+            new_begin = {}
+            for word, steps in begin.items():
+                for i in range(len(word)):
+                    for c in 'qwertyuiopasdfghjklzxcvbnm':
+                        new_word = word[:i] + c + word[i + 1:]
+                        if new_word in end:
+                            return steps + end[new_word]
+                        if new_word in wordSet:
+                            new_begin[new_word] = steps + 1
+            begin = new_begin
+            wordSet -= set(new_begin)
+        return 0
+```
+
 ### 105. 有向图的完全可达性（卡码网）
+
 ### [463. 岛屿的周长 | 106. 岛屿的周长（卡码网）](https://leetcode.cn/problems/island-perimeter/description)
+
+```python
+class Solution:
+    def islandPerimeter(self, grid: List[List[int]]) -> int:
+        res = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    res += 4
+                    if i > 0 and grid[i - 1][j] == 1:
+                        res -= 2
+                    if j > 0 and grid[i][j - 1] == 1:
+                        res -= 2
+        return res
+```
+
 ### 107. 寻找存在的路径（卡码网）
 ### 108. 冗余连接（卡码网）
 ### 109. 冗余连接II（卡码网）
@@ -686,13 +1051,106 @@ class Solution:
 ### 96. 城市间货物运输 III（卡码网）
 ### 97. 小明逛公园（卡码网）
 ### 127. 骑士的攻击（卡码网）
+
 ## 额外题目
+
 ### [1365. 有多少小于当前数字的数字](https://leetcode.cn/problems/how-many-numbers-are-smaller-than-the-current-number/description)
+
+```python
+class Solution:
+    def smallerNumbersThanCurrent(self, nums: List[int]) -> List[int]:
+        mp = {}
+        for i, num in enumerate(sorted(nums)):
+            mp[num] = mp.get(num, i)
+        return [mp[num] for num in nums]
+```
+
 ### [941. 有效的山脉数组](https://leetcode.cn/problems/valid-mountain-array/description)
+
+```python
+class Solution:
+    def validMountainArray(self, nums: List[int]) -> bool:
+        n = len(nums)
+        if n < 3:
+            return False
+        i = 0
+        while i < n - 1 and nums[i] < nums[i + 1]:
+            i += 1
+        if i == 0 or i == n - 1:
+            return False
+        while i < n - 1 and nums[i] > nums[i + 1]:
+            i += 1
+        return i == n - 1
+```
+
 ### [1207. 独一无二的出现次数](https://leetcode.cn/problems/unique-number-of-occurrences/description)
+
+```python
+class Solution:
+    def uniqueOccurrences(self, arr: List[int]) -> bool:
+        cnt = Counter(arr)
+        return len(set(cnt.values())) == len(cnt)
+```
+
 ### [724. 寻找数组的中心下标](https://leetcode.cn/problems/find-pivot-index/description)
+
+```python
+class Solution:
+    def pivotIndex(self, nums: List[int]) -> int:
+        s = sum(nums)
+        l = 0
+        for i in range(len(nums)):
+            if 2 * l + nums[i] == s:
+                return i
+            l += nums[i]
+        return -1
+```
+
 ### [922. 按奇偶排序数组 II](https://leetcode.cn/problems/sort-array-by-parity-ii/description)
+
+```python
+class Solution:
+    def sortArrayByParityII(self, nums: List[int]) -> List[int]:
+        right = 1
+        for left in range(0, len(nums), 2):
+            if nums[left] % 2 == 1:
+                while nums[right] % 2 == 1:
+                    right += 2
+                nums[left], nums[right] = nums[right], nums[left]
+        return nums
+```
+
 ### [143. 重排链表](https://leetcode.cn/problems/reorder-list/description)
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+
+class Solution:
+    def reorderList(self, head: Optional[ListNode]) -> None:
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        mp = []
+        p = head
+        while p:
+            mp.append(p)
+            p = p.next
+        left, right = 0, len(mp) - 1
+        while left < right:
+            mp[left].next = mp[right]
+            left += 1
+            if left == right:
+                break
+            mp[right].next = mp[left]
+            right -= 1
+        mp[left].next = None
+```
+
 ### [205. 同构字符串](https://leetcode.cn/problems/isomorphic-strings/description)
 ### [1002. 查找共用字符](https://leetcode.cn/problems/find-common-characters/description)
 ### [925. 长按键入](https://leetcode.cn/problems/long-pressed-name/description)
